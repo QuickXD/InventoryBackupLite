@@ -1,0 +1,4 @@
+name: JoinBackup
+version: '${project.version}'
+main: it.quick.joinbackup.JoinBackup
+api-version: '1.13'
