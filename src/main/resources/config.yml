@@ -1,0 +1,3 @@
+join:
+  enabled: true
+  max_backups: 1

@@ -2,3 +2,8 @@ name: JoinBackup
 version: '${project.version}'
 main: it.quick.joinbackup.JoinBackup
 api-version: '1.13'
+commands:
+  inventorybackupper:
+    description: "Comando per gestire il backup dell'inventario"
+    permission: inventorybackupper.loadinv
+
