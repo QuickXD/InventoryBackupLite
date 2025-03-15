@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import it.quick.joinbackup.database.DatabaseManager;
 import it.quick.joinbackup.database.InventoryManager;
 
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -112,22 +111,40 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         ItemStack[] inventoryItems = InventoryManager.deserializeInventory(inventoryBase64);
         ItemStack[] armorItems = InventoryManager.deserializeInventory(armorBase64);
 
-        for (int i = 0; i < inventoryItems.length && i < 36; i++) {
-            if (inventoryItems[i] != null) {
+        for (int i = 0; i < 36; i++) {
+            if (i < inventoryItems.length && inventoryItems[i] != null && inventoryItems[i].getType() != Material.AIR) {
                 inventoryGui.setItem(i, ItemBuilder.from(inventoryItems[i]).asGuiItem());
+            } else {
+                inventoryGui.setItem(i, ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE)
+                        .name(Component.text(" "))
+                        .asGuiItem());
             }
         }
 
         int armorStartSlot = 36;
-        for (int i = 0; i < armorItems.length && i < 4; i++) {
-            if (armorItems[i] != null) {
+        for (int i = 0; i < 4; i++) {
+            if (i < armorItems.length && armorItems[i] != null && armorItems[i].getType() != Material.AIR) {
                 inventoryGui.setItem(armorStartSlot + i, ItemBuilder.from(armorItems[i]).asGuiItem());
+            } else {
+                inventoryGui.setItem(armorStartSlot + i, ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE)
+                        .name(Component.text(" "))
+                        .asGuiItem());
+            }
+        }
+
+        for (int i = 40; i < 54; i++) {
+            if (inventoryGui.getGuiItem(i) == null) {
+                inventoryGui.setItem(i, ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE)
+                        .name(Component.text(" "))
+                        .asGuiItem());
             }
         }
 
         inventoryGui.setDefaultClickAction(event -> event.setCancelled(true));
         inventoryGui.open(player);
     }
+
+
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
