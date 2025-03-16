@@ -114,37 +114,25 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         for (int i = 0; i < 36; i++) {
             if (i < inventoryItems.length && inventoryItems[i] != null && inventoryItems[i].getType() != Material.AIR) {
                 inventoryGui.setItem(i, ItemBuilder.from(inventoryItems[i]).asGuiItem());
-            } else {
-                inventoryGui.setItem(i, ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE)
-                        .name(Component.text(" "))
-                        .asGuiItem());
             }
         }
 
-        int armorStartSlot = 36;
+        for (int i = 36; i < 45; i++) {
+            inventoryGui.setItem(i, ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE)
+                    .name(Component.text(" "))
+                    .asGuiItem());
+        }
+
+        int[] armorSlots = {45, 46, 47, 48};
         for (int i = 0; i < 4; i++) {
             if (i < armorItems.length && armorItems[i] != null && armorItems[i].getType() != Material.AIR) {
-                inventoryGui.setItem(armorStartSlot + i, ItemBuilder.from(armorItems[i]).asGuiItem());
-            } else {
-                inventoryGui.setItem(armorStartSlot + i, ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE)
-                        .name(Component.text(" "))
-                        .asGuiItem());
-            }
-        }
-
-        for (int i = 40; i < 54; i++) {
-            if (inventoryGui.getGuiItem(i) == null) {
-                inventoryGui.setItem(i, ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE)
-                        .name(Component.text(" "))
-                        .asGuiItem());
+                inventoryGui.setItem(armorSlots[i], ItemBuilder.from(armorItems[i]).asGuiItem());
             }
         }
 
         inventoryGui.setDefaultClickAction(event -> event.setCancelled(true));
         inventoryGui.open(player);
     }
-
-
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
