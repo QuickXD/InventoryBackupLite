@@ -2,6 +2,7 @@ package it.quick.joinbackup.commands;
 
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.guis.GuiItem;
 import it.quick.joinbackup.JoinBackup;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -72,6 +73,19 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         gui.open(player);
     }
 
+    private GuiItem getBackButton(Player player, Gui previousGui) {
+        return ItemBuilder.from(Material.ARROW)
+                .name(Component.text("§cTorna Indietro"))
+                .lore(Component.text("§7Torna di una GUI Indietro"))
+                .asGuiItem(event -> {
+                    if (previousGui != null) {
+                        previousGui.open(player);
+                    }
+                });
+    }
+
+
+
     private void openBackupListGui(Player player, Player targetPlayer) {
         Gui backupGui = Gui.gui()
                 .title(Component.text("§aBackup di " + targetPlayer.getName()))
@@ -90,7 +104,7 @@ public class LoadInvCommand implements CommandExecutor, Listener {
             int finalI = i;
             backupGui.setItem(i, ItemBuilder.from(Material.PAPER)
                     .name(Component.text("§aBackup #" + (i + 1)))
-                    .asGuiItem(event -> openBackupInventoryGui(player, targetPlayer, finalI)));
+                    .asGuiItem(event -> openBackupInventoryGui(player, targetPlayer, finalI, backupGui)));
         }
 
         backupGui.setDefaultClickAction(event -> event.setCancelled(true));
@@ -98,7 +112,9 @@ public class LoadInvCommand implements CommandExecutor, Listener {
     }
 
 
-    private void openBackupInventoryGui(Player player, Player targetPlayer, int backupIndex) {
+
+
+    private void openBackupInventoryGui(Player player, Player targetPlayer, int backupIndex, Gui previousGui) {
         Gui inventoryGui = Gui.gui()
                 .title(Component.text("§aInventario Backup #" + (backupIndex + 1)))
                 .rows(6)
@@ -130,9 +146,13 @@ public class LoadInvCommand implements CommandExecutor, Listener {
             }
         }
 
+        inventoryGui.setItem(53, getBackButton(player, previousGui));
+
         inventoryGui.setDefaultClickAction(event -> event.setCancelled(true));
         inventoryGui.open(player);
     }
+
+
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
