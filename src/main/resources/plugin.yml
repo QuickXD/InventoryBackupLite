@@ -5,5 +5,9 @@ api-version: '1.13'
 commands:
   inventorybackupper:
     description: "Comando per gestire il backup dell'inventario"
-    permission: inventorybackupper.loadinv
+    permission: inventorybackupper.use
+permissions:
+  inventorybackupper.use:
+    description: Permesso per utilizzare il comando /inventorybackupper loadinv
+    default: op
 

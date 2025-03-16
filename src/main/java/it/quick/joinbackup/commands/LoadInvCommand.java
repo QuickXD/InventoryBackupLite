@@ -34,6 +34,11 @@ public class LoadInvCommand implements CommandExecutor, Listener {
 
         Player player = (Player) sender;
 
+        if (!player.hasPermission("inventorybackupper.use")) {
+            player.sendMessage("§cNon hai il permesso per usare questo comando.");
+            return false;
+        }
+
         if (args.length >= 1 && args[0].equalsIgnoreCase("loadinv")) {
             if (args.length < 2) {
                 player.sendMessage("§cUso del comando non valido. Usa: /inventorybackupper loadinv <player>");
@@ -58,6 +63,7 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         player.sendMessage("§cUso del comando non valido. Usa: /inventorybackupper loadinv <player>");
         return false;
     }
+
 
     private void openInventoryGui(Player player, Player targetPlayer) {
         Gui gui = Gui.gui()
