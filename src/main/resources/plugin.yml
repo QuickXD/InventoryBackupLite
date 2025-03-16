@@ -10,4 +10,6 @@ permissions:
   inventorybackupper.use:
     description: Permesso per utilizzare il comando /inventorybackupper loadinv
     default: op
-
+  inventorybackupper.interact:
+    description: Permesso per interagire con la GUI e prelevare oggetti
+    default: op

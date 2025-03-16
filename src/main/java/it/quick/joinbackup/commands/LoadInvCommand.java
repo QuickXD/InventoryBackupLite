@@ -64,7 +64,6 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         return false;
     }
 
-
     private void openInventoryGui(Player player, Player targetPlayer) {
         Gui gui = Gui.gui()
                 .title(Component.text("§aJOIN BACKUP's " + targetPlayer.getName()))
@@ -90,8 +89,6 @@ public class LoadInvCommand implements CommandExecutor, Listener {
                 });
     }
 
-
-
     private void openBackupListGui(Player player, Player targetPlayer) {
         Gui backupGui = Gui.gui()
                 .title(Component.text("§aBackup di " + targetPlayer.getName()))
@@ -116,9 +113,6 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         backupGui.setDefaultClickAction(event -> event.setCancelled(true));
         backupGui.open(player);
     }
-
-
-
 
     private void openBackupInventoryGui(Player player, Player targetPlayer, int backupIndex, Gui previousGui) {
         Gui inventoryGui = Gui.gui()
@@ -154,11 +148,20 @@ public class LoadInvCommand implements CommandExecutor, Listener {
 
         inventoryGui.setItem(53, getBackButton(player, previousGui));
 
-        inventoryGui.setDefaultClickAction(event -> event.setCancelled(true));
+        inventoryGui.setDefaultClickAction(event -> {
+            if (player.hasPermission("inventorybackupper.interact")) {
+                if (event.getCurrentItem().getType() != Material.BLACK_STAINED_GLASS_PANE) {
+                    player.getInventory().addItem(event.getCurrentItem());
+                    event.getInventory().setItem(event.getSlot(), new ItemStack(Material.AIR));
+                }
+                event.setCancelled(true);
+            } else {
+                event.setCancelled(true);
+            }
+        });
+
         inventoryGui.open(player);
     }
-
-
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
