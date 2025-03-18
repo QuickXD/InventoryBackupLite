@@ -28,15 +28,23 @@ public class LoadInvCommand implements CommandExecutor, Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§cSolo i giocatori possono usare questo comando.");
+            sender.sendMessage("§c[InventoryStorage] -> Solo i giocatori possono usare questo comando.");
             return false;
         }
 
         Player player = (Player) sender;
 
         if (!player.hasPermission("inventorybackupper.use")) {
-            player.sendMessage("§cNon hai il permesso per usare questo comando.");
+            player.sendMessage("§c[InventoryStorage] -> Non hai il permesso per usare questo comando.");
             return false;
+        }
+
+        // /INVENTORYBACKUPPER INFO
+
+        if (args.length == 1 && args[0].equalsIgnoreCase("info")) {
+            int backupCount = DatabaseManager.getInstance().getBackupCount(player.getUniqueId().toString());
+            player.sendMessage("§a[InventoryStorage] -> Hai " + backupCount + " backup disponibili.");
+            return true;
         }
 
         if (args.length >= 1 && args[0].equalsIgnoreCase("loadinv")) {
@@ -47,7 +55,7 @@ public class LoadInvCommand implements CommandExecutor, Listener {
 
             Player targetPlayer = Bukkit.getPlayer(args[1]);
             if (targetPlayer == null) {
-                player.sendMessage("§cIl giocatore specificato non è online o non esiste.");
+                player.sendMessage("§c[InventoryStorage] -> Il giocatore specificato non è online o non esiste.");
                 return false;
             }
 
@@ -60,9 +68,10 @@ public class LoadInvCommand implements CommandExecutor, Listener {
             return true;
         }
 
-        player.sendMessage("§cUso del comando non valido. Usa: /inventorybackupper loadinv <player>");
+        player.sendMessage("§c[InventoryStorage] -> Usa: /inventorybackupper info o /inventorybackupper loadinv <player>");
         return false;
     }
+
 
     private void openInventoryGui(Player player, Player targetPlayer) {
         Gui gui = Gui.gui()
@@ -83,11 +92,17 @@ public class LoadInvCommand implements CommandExecutor, Listener {
                 .name(Component.text("§cTorna Indietro"))
                 .lore(Component.text("§7Torna di una GUI Indietro"))
                 .asGuiItem(event -> {
-                    if (previousGui != null) {
-                        previousGui.open(player);
+                    if (player.hasPermission("inventorybackupper.interact")) {
+                        if (previousGui != null) {
+                            previousGui.open(player);
+                        }
+                    } else {
+                        player.sendMessage("§cNon hai il permesso per tornare indietro.");
+                        event.setCancelled(true);
                     }
                 });
     }
+
 
     private void openBackupListGui(Player player, Player targetPlayer) {
         Gui backupGui = Gui.gui()
@@ -149,9 +164,26 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         inventoryGui.setItem(53, getBackButton(player, previousGui));
 
         inventoryGui.setDefaultClickAction(event -> {
+            ItemStack clickedItem = event.getCurrentItem();
+
+            if (clickedItem != null && clickedItem.getType() == Material.ARROW) {
+                if (clickedItem.hasItemMeta()) {
+                    String arrowName = clickedItem.getItemMeta().getDisplayName();
+                    String arrowLore = clickedItem.getItemMeta().hasLore() ? clickedItem.getItemMeta().getLore().toString() : "";
+
+                    if (arrowName.equals("§cTorna Indietro") && arrowLore.contains("§7Torna di una GUI Indietro")) {
+                        event.setCancelled(true);
+                        if (previousGui != null) {
+                            previousGui.open(player);
+                        }
+                        return;
+                    }
+                }
+            }
+
             if (player.hasPermission("inventorybackupper.interact")) {
-                if (event.getCurrentItem().getType() != Material.BLACK_STAINED_GLASS_PANE) {
-                    player.getInventory().addItem(event.getCurrentItem());
+                if (clickedItem != null && clickedItem.getType() != Material.BLACK_STAINED_GLASS_PANE) {
+                    player.getInventory().addItem(clickedItem);
                     event.getInventory().setItem(event.getSlot(), new ItemStack(Material.AIR));
                 }
                 event.setCancelled(true);
@@ -163,10 +195,15 @@ public class LoadInvCommand implements CommandExecutor, Listener {
         inventoryGui.open(player);
     }
 
+
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getInventory().getHolder() instanceof Gui) {
-            event.setCancelled(true);
+        if (event.getView().getTopInventory().getHolder() instanceof Gui) {
+            if (event.getClickedInventory() == event.getView().getTopInventory()) {
+                event.setCancelled(true);
+            }
         }
     }
+
 }

@@ -17,6 +17,7 @@ public class JoinBackup extends JavaPlugin {
 
         getLogger().info("maxBackups configurato a: " + maxBackups);
 
+
         DatabaseManager.getInstance().initializeDatabase();
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 
